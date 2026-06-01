@@ -1457,11 +1457,14 @@ QuicCryptoProcessTlsCompletion(
                 Connection->Stats.Handshake.ServerFlight1Bytes = Crypto->TlsState.BufferOffset1Rtt;
             }
         } else {
-            if (Crypto->TlsState.WriteKey == QUIC_PACKET_KEY_HANDSHAKE) {
+            if (Crypto->TlsState.WriteKey >= QUIC_PACKET_KEY_HANDSHAKE) {
                 //
                 // Per RFC 9001 s4.9.1, a client MUST discard Initial keys when
                 // it first sends a Handshake packet. Now that we have the Handshake write key,
                 // the next packet sent will be a Handshake packet.
+                //
+                // Note: in PSK resumption, the TLS stack may install both the Handshake and 1-RTT
+                // write keys in a single completion, so WriteKey can advance past HANDSHAKE here.
                 //
                 QuicCryptoDiscardKeys(Crypto, QUIC_PACKET_KEY_INITIAL);
 
