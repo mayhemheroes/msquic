@@ -479,12 +479,16 @@ QuicPacketBuilderPrepare(
     CXPLAT_DBG_ASSERT(Builder->Key == Connection->Crypto.TlsState.WriteKeys[NewPacketKeyType]);
     CXPLAT_DBG_ASSERT(Builder->BatchCount == 0 || Builder->PacketType == SEND_PACKET_SHORT_HEADER_TYPE);
     //
-    // Check a client's initial keys have been discarded before a handshaking packet is sent
+    // Check a client's initial keys have been discarded before a handshaking packet is sent.
+    // The exception is when the connection is shutting down locally: a TLS error can short-circuit
+    // QuicCryptoProcessTlsCompletion after the secret callback already advanced WriteKey, leaving
+    // the Initial keys briefly allocated while CONNECTION_CLOSE is emitted on both levels.
     //
     CXPLAT_DBG_ASSERT(
         QuicConnIsServer(Connection) ||
         NewPacketKeyType != QUIC_PACKET_KEY_HANDSHAKE ||
-        Connection->Crypto.TlsState.WriteKeys[QUIC_PACKET_KEY_INITIAL] == NULL);
+        Connection->Crypto.TlsState.WriteKeys[QUIC_PACKET_KEY_INITIAL] == NULL ||
+        Connection->State.ClosedLocally);
 
     Result = TRUE;
 
