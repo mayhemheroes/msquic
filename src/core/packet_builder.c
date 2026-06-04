@@ -478,17 +478,6 @@ QuicPacketBuilderPrepare(
     CXPLAT_DBG_ASSERT(Builder->PacketType == NewPacketType);
     CXPLAT_DBG_ASSERT(Builder->Key == Connection->Crypto.TlsState.WriteKeys[NewPacketKeyType]);
     CXPLAT_DBG_ASSERT(Builder->BatchCount == 0 || Builder->PacketType == SEND_PACKET_SHORT_HEADER_TYPE);
-    //
-    // Check a client's initial keys have been discarded before a handshaking packet is sent.
-    // The exception is when the connection is shutting down locally: a TLS error can short-circuit
-    // QuicCryptoProcessTlsCompletion after the secret callback already advanced WriteKey, leaving
-    // the Initial keys briefly allocated while CONNECTION_CLOSE is emitted on both levels.
-    //
-    CXPLAT_DBG_ASSERT(
-        QuicConnIsServer(Connection) ||
-        NewPacketKeyType != QUIC_PACKET_KEY_HANDSHAKE ||
-        Connection->Crypto.TlsState.WriteKeys[QUIC_PACKET_KEY_INITIAL] == NULL ||
-        Connection->State.ClosedLocally);
 
     Result = TRUE;
 
@@ -1062,6 +1051,24 @@ Exit:
                 QUIC_CLOSE_SILENT,
                 QUIC_ERROR_NO_ERROR,
                 NULL);
+        }
+
+        //
+        // Per RFC 9001 s4.9.1, a client MUST discard Initial keys when it first sends a
+        // Handshake packet. We do it here, after the Handshake packet has been committed
+        // to the batch (mirroring quiche's "drop_epoch_state(Initial)" after sending a
+        // Handshake packet). This avoids the issue #5998 race where discarding mid-flush
+        // inside QuicPacketBuilderPrepare would mutate congestion-control state
+        // (QuicLossDetectionDiscardPackets resets bytes-in-flight) after the builder had
+        // already snapshotted SendAllowance, leading to stalled sends until the PTO.
+        // Doing it after the per-packet CC accounting means subsequent packets in the
+        // same flush continue to use the (now conservative) snapshot, and the next
+        // flush takes a fresh snapshot against the post-discard CC state.
+        //
+        if (QuicConnIsClient(Connection) &&
+            Builder->EncryptLevel == QUIC_ENCRYPT_LEVEL_HANDSHAKE &&
+            Connection->Crypto.TlsState.WriteKeys[QUIC_PACKET_KEY_INITIAL] != NULL) {
+            QuicCryptoDiscardKeys(&Connection->Crypto, QUIC_PACKET_KEY_INITIAL);
         }
 
     } else if (FlushBatchedDatagrams) {
