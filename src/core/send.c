@@ -1490,6 +1490,17 @@ QuicSendFlush(
 
     QuicPacketBuilderCleanup(&Builder);
 
+    //
+    // Apply any deferred Initial-keys discard now that the send loop has
+    // committed all packets and the builder is no longer referencing the
+    // Initial keys. See QUIC_PACKET_BUILDER::ClientInitialDiscardPending and
+    // RFC 9001 s4.9.1.
+    //
+    if (Builder.ClientInitialDiscardPending &&
+        Connection->Crypto.TlsState.WriteKeys[QUIC_PACKET_KEY_INITIAL] != NULL) {
+        QuicCryptoDiscardKeys(&Connection->Crypto, QUIC_PACKET_KEY_INITIAL);
+    }
+
     QuicTraceLogConnVerbose(
         SendFlushComplete,
         Connection,

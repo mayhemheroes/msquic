@@ -1054,21 +1054,24 @@ Exit:
         }
 
         //
-        // Per RFC 9001 s4.9.1, a client MUST discard Initial keys when it first sends a
-        // Handshake packet. We do it here, after the Handshake packet has been committed
-        // to the batch (mirroring quiche's "drop_epoch_state(Initial)" after sending a
-        // Handshake packet). This avoids the issue #5998 race where discarding mid-flush
-        // inside QuicPacketBuilderPrepare would mutate congestion-control state
-        // (QuicLossDetectionDiscardPackets resets bytes-in-flight) after the builder had
-        // already snapshotted SendAllowance, leading to stalled sends until the PTO.
-        // Doing it after the per-packet CC accounting means subsequent packets in the
-        // same flush continue to use the (now conservative) snapshot, and the next
-        // flush takes a fresh snapshot against the post-discard CC state.
+        // Per RFC 9001 s4.9.1, a client MUST discard its Initial keys when it
+        // first sends a Handshake packet (mirroring quiche's
+        // drop_epoch_state(Initial) after a Handshake send). Just mark the
+        // discard as pending; QuicSendFlush will perform it once the send loop
+        // completes. Deferring is required because:
+        //   - Finalize can be invoked from QuicPacketBuilderPrepare when the
+        //     packet type changes, and a discard here would clear
+        //     WriteKeys[INITIAL] before Prepare re-assigns Builder->Key,
+        //     hitting the CXPLAT_DBG_ASSERT(Builder->Key != NULL) (#5990).
+        //   - QuicCryptoDiscardKeys implicitly ACKs outstanding Initial
+        //     packets which mutates congestion-control state and would
+        //     invalidate the SendAllowance snapshot the builder captured at
+        //     Initialize, stalling further sends until the PTO (#5998).
         //
         if (QuicConnIsClient(Connection) &&
             Builder->EncryptLevel == QUIC_ENCRYPT_LEVEL_HANDSHAKE &&
             Connection->Crypto.TlsState.WriteKeys[QUIC_PACKET_KEY_INITIAL] != NULL) {
-            QuicCryptoDiscardKeys(&Connection->Crypto, QUIC_PACKET_KEY_INITIAL);
+            Builder->ClientInitialDiscardPending = TRUE;
         }
 
     } else if (FlushBatchedDatagrams) {
