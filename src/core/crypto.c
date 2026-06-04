@@ -551,7 +551,14 @@ QuicCryptoDiscardKeys(
         KeyType == QUIC_PACKET_KEY_INITIAL ?
             Crypto->TlsState.BufferOffsetHandshake :
             Crypto->TlsState.BufferOffset1Rtt;
-    CXPLAT_DBG_ASSERT(BufferOffset != 0);
+    //
+    // BufferOffset may legitimately be 0 here when discarding Initial keys: some TLS
+    // providers (e.g. OpenSSL) install the Handshake write key in the secret callback
+    // before producing any Handshake-level CRYPTO data, so the client can be told to
+    // drop Initial keys before BufferOffsetHandshake has moved. The buffer/offset
+    // adjustments below all guard with "if (X < BufferOffset)" and are no-ops in that
+    // case, so this path remains safe.
+    //
     CXPLAT_DBG_ASSERT(Crypto->MaxSentLength >= BufferOffset);
     if (Crypto->NextSendOffset < BufferOffset) {
         Crypto->NextSendOffset = BufferOffset;
@@ -1459,9 +1466,12 @@ QuicCryptoProcessTlsCompletion(
         } else {
             if (Crypto->TlsState.WriteKey >= QUIC_PACKET_KEY_HANDSHAKE) {
                 //
-                // Per RFC 9001 s4.9.1, a client MUST discard Initial keys when
-                // it first sends a Handshake packet. Now that we have the Handshake write key,
-                // the next packet sent will be a Handshake packet.
+                // Per RFC 9001 s4.9.1, a client MUST discard Initial keys when it first sends a
+                // Handshake packet. Now that we have the Handshake write key, the next packet sent
+                // will be a Handshake packet. The discard cannot happen mid-flush in
+                // QuicPacketBuilderPrepare because the resulting congestion-control state reset
+                // would invalidate the SendAllowance snapshot already taken by the builder (see
+                // issue #5998).
                 //
                 // Note: in PSK resumption, the TLS stack may install both the Handshake and 1-RTT
                 // write keys in a single completion, so WriteKey can advance past HANDSHAKE here.
