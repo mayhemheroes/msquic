@@ -1053,25 +1053,8 @@ Exit:
                 NULL);
         }
 
-        //
-        // Per RFC 9001 s4.9.1, a client MUST discard its Initial keys when it
-        // first sends a Handshake packet (mirroring quiche's
-        // drop_epoch_state(Initial) after a Handshake send). Just mark the
-        // discard as pending; QuicSendFlush will perform it once the send loop
-        // completes. Deferring is required because:
-        //   - Finalize can be invoked from QuicPacketBuilderPrepare when the
-        //     packet type changes, and a discard here would clear
-        //     WriteKeys[INITIAL] before Prepare re-assigns Builder->Key,
-        //     hitting the CXPLAT_DBG_ASSERT(Builder->Key != NULL) (#5990).
-        //   - QuicCryptoDiscardKeys implicitly ACKs outstanding Initial
-        //     packets which mutates congestion-control state and would
-        //     invalidate the SendAllowance snapshot the builder captured at
-        //     Initialize, stalling further sends until the PTO (#5998).
-        //
-        if (QuicConnIsClient(Connection) &&
-            Builder->EncryptLevel == QUIC_ENCRYPT_LEVEL_HANDSHAKE &&
-            Connection->Crypto.TlsState.WriteKeys[QUIC_PACKET_KEY_INITIAL] != NULL) {
-            Builder->ClientInitialDiscardPending = TRUE;
+        if (Builder->EncryptLevel == QUIC_ENCRYPT_LEVEL_HANDSHAKE) {
+            Builder->HandshakePacketSent = TRUE;
         }
 
     } else if (FlushBatchedDatagrams) {

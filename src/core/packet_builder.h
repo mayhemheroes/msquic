@@ -84,14 +84,9 @@ typedef struct QUIC_PACKET_BUILDER {
     uint8_t WrittenConnectionCloseFrame : 1;
 
     //
-    // Indicates the client has committed a Handshake packet during this flush
-    // and therefore needs to discard its Initial keys per RFC 9001 s4.9.1.
-    // The actual discard is deferred until after the send loop completes so it
-    // cannot run inside QuicPacketBuilderPrepare (which would race with
-    // Prepare(INITIAL) for loss recovery and null out Builder->Key) nor
-    // invalidate the in-progress per-packet congestion-control accounting.
+    // Indicates some packet has been sent using Handshake keys.
     //
-    uint8_t ClientInitialDiscardPending : 1;
+    uint8_t HandshakePacketSent : 1;
 
     //
     // The total number of datagrams that have been created.

@@ -1491,13 +1491,11 @@ QuicSendFlush(
     QuicPacketBuilderCleanup(&Builder);
 
     //
-    // Apply any deferred Initial-keys discard now that the send loop has
-    // committed all packets and the builder is no longer referencing the
-    // Initial keys. See QUIC_PACKET_BUILDER::ClientInitialDiscardPending and
-    // RFC 9001 s4.9.1.
+    // Per RFC 9001 s4.9.1, a client MUST discard its Initial keys when it
+    // first sends a Handshake packet. This is done at the end of the flush to not
+    // modify the congestion control state while the builder relies on it.
     //
-    if (Builder.ClientInitialDiscardPending &&
-        Connection->Crypto.TlsState.WriteKeys[QUIC_PACKET_KEY_INITIAL] != NULL) {
+    if (QuicConnIsClient(Connection) && Builder.HandshakePacketSent) {
         QuicCryptoDiscardKeys(&Connection->Crypto, QUIC_PACKET_KEY_INITIAL);
     }
 
