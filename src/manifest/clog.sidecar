@@ -245,7 +245,7 @@
     },
     "BindingCreated": {
       "ModuleProperites": {},
-      "TraceString": "[bind][%p] Created, Udp=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!",
+      "TraceString": "[bind][%p] Created, Socket=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!",
       "UniqueId": "BindingCreated",
       "splitArgs": [
         {
@@ -401,7 +401,7 @@
     },
     "BindingRundown": {
       "ModuleProperites": {},
-      "TraceString": "[bind][%p] Rundown, Udp=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!",
+      "TraceString": "[bind][%p] Rundown, Socket=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!",
       "UniqueId": "BindingRundown",
       "splitArgs": [
         {
@@ -13129,9 +13129,9 @@
         "EncodingString": "[bind][%p] Cleaning up"
       },
       {
-        "UniquenessHash": "de67327e-34fe-e36e-e687-09f38be7e043",
+        "UniquenessHash": "050d2c92-57c6-a3ae-3094-5469e2d2d844",
         "TraceID": "BindingCreated",
-        "EncodingString": "[bind][%p] Created, Udp=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!"
+        "EncodingString": "[bind][%p] Created, Socket=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!"
       },
       {
         "UniquenessHash": "9dc8a42f-5829-5abf-0bb0-5040ff1428b9",
@@ -13169,9 +13169,9 @@
         "EncodingString": "[bind][%p] Listener (%p) already registered on ALPN"
       },
       {
-        "UniquenessHash": "229b6b27-7423-c3ab-5a3e-f99929ef7e50",
+        "UniquenessHash": "7890b25c-8aa6-dc5a-b9ca-8b4e82b34e4c",
         "TraceID": "BindingRundown",
-        "EncodingString": "[bind][%p] Rundown, Udp=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!"
+        "EncodingString": "[bind][%p] Rundown, Socket=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!"
       },
       {
         "UniquenessHash": "8419ad0b-e226-53e3-837c-4eebd4cc6619",

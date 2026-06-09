@@ -170,10 +170,10 @@ TRACEPOINT_EVENT(CLOG_BINDING_C, BindingErrorStatus,
 
 /*----------------------------------------------------------
 // Decoder Ring for BindingCreated
-// [bind][%p] Created, Udp=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!
+// [bind][%p] Created, Socket=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!
 // QuicTraceEvent(
         BindingCreated,
-        "[bind][%p] Created, Udp=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!",
+        "[bind][%p] Created, Socket=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!",
         Binding,
         Binding->Socket,
         CASTED_CLOG_BYTEARRAY(sizeof(DatapathLocalAddr), &DatapathLocalAddr),
@@ -243,10 +243,10 @@ TRACEPOINT_EVENT(CLOG_BINDING_C, BindingDestroyed,
 
 /*----------------------------------------------------------
 // Decoder Ring for BindingRundown
-// [bind][%p] Rundown, Udp=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!
+// [bind][%p] Rundown, Socket=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!
 // QuicTraceEvent(
         BindingRundown,
-        "[bind][%p] Rundown, Udp=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!",
+        "[bind][%p] Rundown, Socket=%p LocalAddr=%!ADDR! RemoteAddr=%!ADDR!",
         Binding,
         Binding->Socket,
         CASTED_CLOG_BYTEARRAY(sizeof(DatapathLocalAddr), &DatapathLocalAddr),
