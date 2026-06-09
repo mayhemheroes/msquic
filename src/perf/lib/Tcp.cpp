@@ -91,7 +91,7 @@ void TcpConfiguration::SecConfigCallback(
 
 // ############################# ENGINE #############################
 
-const CXPLAT_TCP_DATAPATH_CALLBACKS TcpEngine::TcpCallbacks = {
+const CXPLAT_DATAPATH_CONN_CALLBACKS TcpEngine::TcpCallbacks = {
     TcpServer::AcceptCallback,
     TcpConnection::ConnectCallback,
     TcpConnection::ReceiveCallback,

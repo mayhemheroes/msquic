@@ -43,12 +43,12 @@ typedef struct CXPLAT_DATAPATH_COMMON {
     //
     // The UDP callback function pointers.
     //
-    CXPLAT_UDP_DATAPATH_CALLBACKS UdpHandlers;
+    CXPLAT_DATAPATH_DGRAM_CALLBACKS UdpHandlers;
 
     //
     // The TCP callback function pointers.
     //
-    CXPLAT_TCP_DATAPATH_CALLBACKS TcpHandlers;
+    CXPLAT_DATAPATH_CONN_CALLBACKS TcpHandlers;
 
     //
     // The Worker WorkerPool
@@ -1089,8 +1089,8 @@ _IRQL_requires_max_(PASSIVE_LEVEL)
 QUIC_STATUS
 DataPathInitialize(
     _In_ uint32_t ClientRecvDataLength,
-    _In_opt_ const CXPLAT_UDP_DATAPATH_CALLBACKS* UdpCallbacks,
-    _In_opt_ const CXPLAT_TCP_DATAPATH_CALLBACKS* TcpCallbacks,
+    _In_opt_ const CXPLAT_DATAPATH_DGRAM_CALLBACKS* UdpCallbacks,
+    _In_opt_ const CXPLAT_DATAPATH_CONN_CALLBACKS* TcpCallbacks,
     _In_ CXPLAT_WORKER_POOL* WorkerPool,
     _In_ CXPLAT_DATAPATH_INIT_CONFIG* InitConfig,
     _Out_ CXPLAT_DATAPATH** NewDatapath

@@ -305,7 +305,7 @@ QuicMainStart(
     WorkerPool = CxPlatWorkerPoolCreate(nullptr, CXPLAT_WORKER_POOL_REF_TOOL);
 #endif
 
-    const CXPLAT_UDP_DATAPATH_CALLBACKS DatapathCallbacks = {
+    const CXPLAT_DATAPATH_DGRAM_CALLBACKS DatapathCallbacks = {
         PerfServer::DatapathReceive,
         PerfServer::DatapathUnreachable
     };

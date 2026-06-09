@@ -431,7 +431,7 @@ main(
         (AttackType <= 0 || AttackType > 4)) {
         PrintUsage();
     } else {
-        const CXPLAT_UDP_DATAPATH_CALLBACKS DatapathCallbacks = {
+        const CXPLAT_DATAPATH_DGRAM_CALLBACKS DatapathCallbacks = {
             UdpRecvCallback,
             UdpUnreachCallback,
         };

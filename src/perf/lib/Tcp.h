@@ -89,7 +89,7 @@ class TcpEngine {
     CxPlatLockDispatch ConnectionLock;
     CXPLAT_LIST_ENTRY Connections;
 public:
-    static const CXPLAT_TCP_DATAPATH_CALLBACKS TcpCallbacks;
+    static const CXPLAT_DATAPATH_CONN_CALLBACKS TcpCallbacks;
     static const CXPLAT_TLS_CALLBACKS TlsCallbacks;
     const TcpAcceptHandler AcceptHandler;
     const TcpConnectHandler ConnectHandler;

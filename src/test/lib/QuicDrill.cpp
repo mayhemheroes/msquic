@@ -138,7 +138,7 @@ struct DrillSender {
         _In_ uint16_t NetworkPort
         )
     {
-        const CXPLAT_UDP_DATAPATH_CALLBACKS DatapathCallbacks = {
+        const CXPLAT_DATAPATH_DGRAM_CALLBACKS DatapathCallbacks = {
             DrillUdpRecvCallback,
             DrillUdpUnreachCallback,
         };

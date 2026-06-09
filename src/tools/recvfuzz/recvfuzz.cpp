@@ -1661,7 +1661,7 @@ void SetupAndFuzz() {
     CxPlatInitialize();
 
     CXPLAT_DATAPATH* Datapath;
-    const CXPLAT_UDP_DATAPATH_CALLBACKS DatapathCallbacks = {
+    const CXPLAT_DATAPATH_DGRAM_CALLBACKS DatapathCallbacks = {
         UdpRecvCallback,
         UdpUnreachCallback,
     };
