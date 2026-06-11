@@ -1,0 +1,8 @@
+project: msquic
+target: fuzz
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz/testsuite
+cmds:
+  - cmd: /mayhem/fuzz
+    libfuzzer: true

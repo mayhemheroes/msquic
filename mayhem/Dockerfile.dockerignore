@@ -1,0 +1,19 @@
+# Per-Dockerfile ignore (BuildKit honors "<dockerfile-path>.dockerignore" and it OVERRIDES the root
+# .dockerignore for builds with `-f mayhem/Dockerfile`). Upstream's root .dockerignore is `*` +
+# a tiny allowlist tuned for OSS-Fuzz's `docker build .`; it would strip .git, mayhem/, .github/ and
+# submodules/googletest from OUR context. We cannot edit that tracked file additively, so this
+# additive sibling file restores the full dev-image context the spec requires (full source + .git +
+# all submodules), dropping only local build artifacts and editor/OS cruft.
+
+# ── Build outputs / local cruft (produced inside the image by mayhem/build.sh; absent from a clean
+#    checkout — listed only so a pre-existing local build doesn't bloat the context) ──────────────
+build/
+_out/
+artifacts/
+mayhem/_out/
+**/__pycache__/
+
+# ── Editor / OS noise ─────────────────────────────────────────────────────────────────────────────
+.DS_Store
+*.swp
+*~

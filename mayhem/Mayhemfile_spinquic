@@ -1,0 +1,9 @@
+project: msquic
+target: spinquic
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/spinquic/testsuite
+cmds:
+  - cmd: /mayhem/spinquic
+    libfuzzer: true
+    dictionary: /mayhem/mayhem/spinquic.dict
